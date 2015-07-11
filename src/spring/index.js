@@ -1,7 +1,7 @@
 import { createEndValueType, noSpeed } from '../utils';
 import { PropTypes } from 'react';
+import animate from './animate';
 import Motion from '../motion';
-import animate from './animate'
 
 export default class Spring extends Motion {
   static propTypes = {
