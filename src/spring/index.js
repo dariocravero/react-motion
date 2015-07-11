@@ -1,6 +1,7 @@
-import { createEndValueType, FRAME_RATE, noSpeed, updateCurrV, updateCurrVals } from './utils';
-import Motion from './motion';
+import { createEndValueType, noSpeed } from '../utils';
 import { PropTypes } from 'react';
+import Motion from '../motion';
+import animate from './animate'
 
 export default class Spring extends Motion {
   static propTypes = {
@@ -13,25 +14,10 @@ export default class Spring extends Motion {
       return;
     }
     this._rafID = requestAnimationFrame(() => {
-      const { currVals, currV, now } = this.state;
-      let { endValue } = this.props;
-      if (typeof endValue === 'function') {
-        endValue = endValue(currVals);
-      }
-      const frameRate = now && !justStarted ? (Date.now() - now) / 1000 : FRAME_RATE;
+      const newState = animate(this.state, {endValue: this.props.endValue, justStarted});
+      this.setState(() => newState);
 
-      const newCurrV = updateCurrV(frameRate, currVals, currV, endValue);
-      const newCurrVals = updateCurrVals(frameRate, currVals, currV, endValue);
-
-      this.setState(() => {
-        return {
-          currV: newCurrV,
-          currVals: newCurrVals,
-          now: Date.now()
-        };
-      });
-
-      const stop = noSpeed(newCurrV);
+      const stop = noSpeed(newState.currV);
       if (stop && !justStarted) {
         // this flag is necessary, because in `endValue` callback, the user
         // might check that the current value has reached the destination, and
